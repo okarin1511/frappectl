@@ -41,12 +41,21 @@ def parse_filter(token: str) -> list[Any]:
             value = stripped[idx + len(word_op) :].strip()
             return [field, word_op.strip(), _coerce(value)]
 
+    best_idx = -1
+    best_op = ""
     for op in _OPERATORS:
         idx = stripped.find(op)
-        if idx > 0:
-            field = stripped[:idx].strip()
-            value = stripped[idx + len(op) :].strip()
-            return [field, op, _coerce(value)]
+        if idx > 0 and (
+            best_idx == -1
+            or idx < best_idx
+            or (idx == best_idx and len(op) > len(best_op))
+        ):
+            best_idx = idx
+            best_op = op
+    if best_idx > 0:
+        field = stripped[:best_idx].strip()
+        value = stripped[best_idx + len(best_op) :].strip()
+        return [field, best_op, _coerce(value)]
 
     raise UsageError(
         f"Could not parse filter {token!r}. Use field=value, field>value, "

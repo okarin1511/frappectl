@@ -23,6 +23,19 @@ def test_parse_filter(token, expected):
     assert helpers.parse_filter(token) == expected
 
 
+@pytest.mark.parametrize(
+    "token,expected",
+    [
+        ("note=score>=90", ["note", "=", "score>=90"]),
+        ("formula=a!=b", ["formula", "=", "a!=b"]),
+        ("desc=x>y", ["desc", "=", "x>y"]),
+        ("val=a<=b", ["val", "=", "a<=b"]),
+    ],
+)
+def test_parse_filter_operator_in_value(token, expected):
+    assert helpers.parse_filter(token) == expected
+
+
 def test_parse_filter_bad():
     with pytest.raises(UsageError):
         helpers.parse_filter("justaword")
